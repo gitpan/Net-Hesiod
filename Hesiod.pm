@@ -30,7 +30,7 @@ use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION %EXPORT_TAGS);
 			hesiod_to_bind hesiod_getpwnam hesiod_getpwuid
 			hesiod_getservbyname hesiod_getmailhost);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

@@ -1,4 +1,8 @@
 Revision history for Perl extension Net::Hesiod.
+1.11  Tue Sep 10 19:08:00 2002
+	Some minor changes in installation.  No changes in actual module, just
+	will now search for hesiod stuff a bit better.  Also trying to make
+	more compatible for CPAN module installs.
 1.10  Tue Apr 24 13:00:00 2001
 	Discovered that hesiod_getservbyname IS functioning properly by
 	returning port number in network byte order.  Not well documented

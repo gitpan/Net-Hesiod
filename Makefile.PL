@@ -6,13 +6,26 @@ use strict;
 
 #Some platform specific variables
 
-#Root of where hesiod stuff is kept. HESIOD_ROOT_DIR is just a convenience.
+#-----------CHANGE THIS TO REFLECT YOUR SYSTEM CONFIG
+#Root of where hesiod stuff is kept.
 #HESIOD_LIBDIR should be where libhesiod.a is located
 #HESIOD_INCDIR should be where hesiod.h is located
-#-----------CHANGE THIS TO REFLECT YOUR SYSTEM CONFIG
-my $HESIOD_ROOT_DIR="/usr/local/athena";
-my $HESIOD_LIBDIR="$HESIOD_ROOT_DIR/lib";
-my $HESIOD_INCDIR="$HESIOD_ROOT_DIR/include";
+#
+#The subroutines find_hesiod_libdir and find_hesiod_incdir will try to find
+#these directories (simply look in /usr, /usr/local, etc), but may not work
+#on all systems or may find the wrong version.
+#
+#Should your system have problems with find_hesiod_lib/incdir, just comment
+#out these lines
+my $HESIOD_LIBDIR=&find_hesiod_libdir;
+my $HESIOD_INCDIR=&find_hesiod_incdir;
+#and change and uncomment the following (HESIOD_ROOT_DIR is just a convenience)
+#my $HESIOD_ROOT_DIR="/usr/local/athena";
+#my $HESIOD_LIBDIR="$HESIOD_ROOT_DIR/lib";
+#my $HESIOD_INCDIR="$HESIOD_ROOT_DIR/include";
+
+print "Using HESIOD_LIBDIR=$HESIOD_LIBDIR\n";
+print "Using HESIOD_INCDIR=$HESIOD_INCDIR\n";
 
 #MISC_LIBS list any other libraries that may be needed.
 #Some systems (e.g. alpha-dec-osf ) require libresolv.a to be linked in,
@@ -90,3 +103,72 @@ WriteMakefile(
 );
 
 require 't/make_testdata.pl';
+
+sub _find_hesiod_dir($$)
+#Helper for find_hesiod_incdir, libdir
+{	my $dir = shift;
+	my $file = shift;
+
+	my @root_dirs = (
+		'',
+		'/usr',
+		'/usr/local',
+		'/hesiod',
+		'/athena',
+		'/usr/hesiod',
+		'/usr/athena',
+		'/usr/local/hesiod',
+		'/usr/local/athena'
+		);
+
+	my ($rdir,$tdir, $tfile);
+	foreach $rdir ( @root_dirs )
+	{	$tdir = "$rdir/$dir";
+		$tfile = "$tdir/$file";
+		return $tdir if ( -e $tfile ) ;
+	}
+
+	#Nothing found
+	die <<EOF;
+Unable to find $dir directory for hesiod stuff (the directory which contains
+$file).
+
+If hesiod is not installed, there is no point in installing this module.  
+Install hesiod first, or forget about installing this module.
+
+If hesiod is already installed, I can't find it.  You will need to edit the
+variables HESIOD_INCDIR and/or HESIOD_LIBDIR near the top of Makefile.PL
+to reflect the directories wherein hesiod.h and libhesiod.a can be found.
+You may also need to do this if multiple copies of the files exist and I am
+finding the wrong one.  Sorry.
+
+EOF
+}
+
+
+sub find_hesiod_incdir()
+{	my $dir = 'include';
+	my $file = 'hesiod.h';
+
+	my $res = _find_hesiod_dir($dir,$file);
+	if ( $res )
+	{	print "Found $file in $dir\n";
+		return $res;
+	} else
+	{	die "$file not found be _find_hesiod_dir";
+	}
+}
+sub find_hesiod_libdir()
+{	my $dir = 'lib';
+	my $file = 'libhesiod.a';
+
+	my $res = _find_hesiod_dir($dir,$file);
+	if ( $res )
+	{	print "Found $file in $dir\n";
+		return $res;
+	} else
+	{	die "$file not found be _find_hesiod_dir";
+	}
+}
+
+
