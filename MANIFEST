@@ -6,6 +6,7 @@ Hesiod.xs
 MANIFEST
 Makefile.PL
 GPL.TXT
+Artistic.txt
 t/00_autoloads.t
 t/10_test_init_end.t
 t/15_test_tests.t
